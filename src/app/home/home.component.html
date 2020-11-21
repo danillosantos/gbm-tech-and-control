@@ -1,13 +1,558 @@
-<ng-template #dialog>
-  <nb-card>
-    <nb-card-header>Dialog</nb-card-header>
-    <nb-card-body>Hello world!</nb-card-body>
-  </nb-card>
-</ng-template>
+<div id="container" class='row'>
+  <div class='row'>
+    <div class='col-10'>
+      <ul>
+        <li *ngFor='let item of menu' (click)='changeActiveMenu(item)' [ngClass]="{'active': item.active }">
+          {{ item.name }}
+        </li>
+      </ul>
+    </div>
+    <div class='col-2' id='local'>
+      <p>
+        Porto de Santos
+      </p>
+    </div>
+  </div>
+  <div class='col-10' id='list-of-ships' [nbSpinner]='loading'>
+    <div *ngIf='menu[0].active'>
+        <h2 *ngIf='!loading && terminals.length == 0' class='h2-without-results'>
+            Não há dados para mostrar
+          </h2>
+      <nb-card *ngFor='let terminal of terminals' (click)='expandTerminalCard(terminal)'>
+        <nb-card-header *ngIf='!terminal.expanded && terminal.ships.length > 0' class='card-header'>
+          <div class='row'>
+            <div class='col-1'>
+              {{ terminal.terminalName }}
+            </div>
+            <div class='ship-header-container col-11'>
+              <div class="row" *ngFor='let ship of terminal.ships'
+                [ngClass]='{"just-one-ship": terminal.ships.length == 1 }'>
+                <div class='col'>
+                  <p>
+                    {{ ship.shipName.length > 10 ? (ship.shipName | slice:0:10) : ship.shipName }}
+                  </p>
+                  <label>
+                    Nome do navio
+                  </label>
+                </div>
+                <div class='col'>
+                  <div>
+                    <p>
+                      {{ ship.productName }}
+                    </p>
+                    <label>
+                      Produto
+                    </label>
+                  </div>
+                </div>
+                <div class='col'>
+                  <div>
+                    <p>
+                      {{ ship.totalManifested | number: '1.0-2' }}t / {{ ship.totalOnBoard | number: '1.0-2' }}t
+                    </p>
+                    <label>
+                      Total manifestado / embarcado
+                    </label>
+                  </div>
+                </div>
 
-<nb-card>
-  <nb-card-header>Hello World</nb-card-header>
-  <nb-card-body>
-    <button nbButton (click)="openDialog(dialog)">Open Dialog</button>
-  </nb-card-body>
-</nb-card>
+                <div class='col'>
+                  <div>
+                    <p class='loading-rate-highlight' [ngClass]="{
+                        'low': ship.loadingRate < 10, 'average': (ship.loadingRate >= 10 && ship.loadingRate < 89), 'high': ship.loadingRate > 89
+                      }">
+                      {{ ship.loadingRate | number: '2.0-1' }}%
+                    </p>
+                    <label class='text-align-center'>
+                      Aderência da prancha
+                    </label>
+                  </div>
+                </div>
+                <div class='col'>
+                  <div>
+                    <p>
+                      {{ ship.incomingMooringDate | date: 'dd/MM/yy HH:mm' }}
+                    </p>
+                    <label>
+                      Data de atracação
+                    </label>
+                  </div>
+                </div>
+                <div *ngIf='!ship.endShipmentDate'>
+                  <p>
+                    {{ ship.estimatedEndShipmentDate | date: 'dd/MM/yy HH:mm' }}
+                  </p>
+                  <label>
+                      Previsão do término
+                  </label>
+                </div>
+                <div *ngIf='ship.endShipmentDate'>
+                    <p>
+                      {{ ship.endShipmentDate | date: 'dd/MM/yy HH:mm' }}
+                    </p>
+                    <label>
+                        Término do embarque
+                    </label>
+                  </div>
+                <div class='col'>
+                  <div>
+                    <p>
+                      {{ ship.estimatedUnmooringDate | date: 'dd/MM/yy HH:mm' }}
+                    </p>
+                    <label>
+                      Previsão de desatracação
+                    </label>
+                  </div>
+                </div>
+
+                <div class='col'>
+                  <div>
+                    <p>
+                      {{ ship.draught ? ship.draught + 'm' : '-' }}
+                    </p>
+                    <label>
+                      Calado
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nb-card-header>
+        <nb-card-header *ngIf='!terminal.expanded && terminal.ships.length == 0' class='card-header-empty'>
+          <div class='row' id='terminal-card-header-animation'>
+            <div class='col-4 without-padding'>
+              {{ terminal.terminalName}} <br>
+              <small>
+                Berço ocioso 
+                <span *ngIf='terminal.lastOutgoingUnmooringDate'>
+                  - última desatracação às {{ terminal.lastOutgoingUnmooringDate | date: 'dd/MM/yy HH:mm' }}
+                </span>
+              </small>
+            </div>
+            <div class="waveWrapper waveAnimation">
+              <div class="waveWrapperInner bgTop">
+                <div class="wave waveTop"
+                  style="background-image: url('http://front-end-noobs.com/jecko/img/wave-top.png')">
+                </div>
+              </div>
+              <div class="waveWrapperInner bgMiddle">
+                <div class="wave waveMiddle"
+                  style="background-image: url('http://front-end-noobs.com/jecko/img/wave-mid.png')"></div>
+              </div>
+              <div class="waveWrapperInner bgBottom">
+                <div class="wave waveBottom"
+                  style="background-image: url('http://front-end-noobs.com/jecko/img/wave-bot.png')"></div>
+              </div>
+            </div>
+          </div>
+
+        </nb-card-header>
+        <nb-card-header *ngIf='terminal.expanded'>
+          {{ terminal.terminalName }}
+        </nb-card-header>
+        <nb-card-body *ngFor='let ship of terminal.ships' [ngClass]='{"hide": !terminal.expanded}'>
+          <div class='row'>
+            <div class='col'>
+              <div>
+                <p>
+                  {{ ship.shipName }}
+                </p>
+                <label>
+                  Nome do navio
+                </label>
+              </div>
+              <div>
+                <div class='progress-container'>
+                  <div class='progress-percentage' [ngStyle]='{"width": ship.percentageOnBoard + "%"}'></div>
+                </div>
+                <label>
+                  {{ship.percentageOnBoard | number : '1.2-2' }}% carregado
+                </label>
+              </div>
+            </div>
+            <div class='col'>
+              <div>
+                <p>
+                  {{ ship.totalManifested | number: '1.0-2' }}t / {{ ship.totalOnBoard | number: '1.0-2' }}t
+                </p>
+                <label>
+                  Total manifestado / embarcado
+                </label>
+              </div>
+              <div class='row  remove-padding'>
+                <div class='col-6'>
+                  <p>
+                    {{ ship.balanceToBeShipped ? (ship.balanceToBeShipped | number: '1.0-2') + 't' : "-" }}
+                  </p>
+                  <label>
+                    Saldo a embarcar
+                  </label>
+                </div>
+                <div class='col-6 space-between'>
+                  <p>
+                    {{ ship.draught ? (ship.draught + 'm') : '-' }}
+                  </p>
+                  <label>
+                    Calado
+                  </label>
+                </div>
+
+              </div>
+            </div>
+            <div class='col'>
+              <div>
+                <p>
+                  {{ ship.incomingMooringDate | date: 'dd/MM/yy HH:mm' }}
+                </p>
+                <label>
+                  Data de atracação
+                </label>
+              </div>
+              <div>
+                <p>
+                  {{ ship.startShipmentDate | date: 'dd/MM/yy HH:mm' }}
+                </p>
+                <label>
+                  Início de embarque
+                </label>
+              </div>
+            </div>
+            <div class='col'>
+              <div>
+                <p>
+                  {{ ship.stoppageHours ? (ship.stoppageHours + ' horas') : 'Sem paradas' }}
+                </p>
+                <label>
+                  Paradas op. excludentes
+                </label>
+              </div>
+              <div>
+                <p>
+                  {{ ship.operationalTime }}
+                </p>
+                <label>
+                  Tempo operacional
+                </label>
+              </div>
+            </div>
+            <div class='col'>
+              <div>
+                <p class='loading-rate-highlight' [ngClass]="{
+              'low': ship.loadingRate < 10, 'average': (ship.loadingRate >= 10 && ship.loadingRate < 89), 'high': ship.loadingRate > 89
+            }">
+                  {{ ship.loadingRate | number: '2.0-1' }}%
+                </p>
+                <label class='text-align-center'>
+                  Aderência da prancha
+                </label>
+              </div>
+              <div>
+                <p class='text-align-center'>
+                  {{ ship.minimumLoadingRate ? (ship.minimumLoadingRate | number: '1.0-2') + 't' : '-' }} /
+                  {{ ship.currentLoadingRate ? (ship.currentLoadingRate | number: '1.0-2') + 't' : '-' }}
+                </p>
+                <label class='text-align-center'>
+                  Prancha mínima / atual
+                </label>
+              </div>
+            </div>
+            <div class='col'>
+                <div *ngIf='!ship.endShipmentDate'>
+                    <p>
+                      {{ ship.estimatedEndShipmentDate }}
+                    </p>
+                    <label> 
+                        Previsão do término
+                    </label>
+                  </div>
+                  <div *ngIf='ship.endShipmentDate'>
+                      <p>
+                        {{ ship.endShipmentDate | date: 'dd/MM/yy HH:mm' }}
+                      </p>
+                      <label>
+                          Término do embarque
+                      </label>
+                    </div>
+              <div>
+                <p>
+                  {{ ship.estimatedUnmooringDate | date: 'dd/MM/yy HH:mm' }}
+                </p>
+                <label>
+                  Previsão de desatracação
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class='row status'>
+            <div class='col'
+              [ngClass]="{'with-data': ship.outgoingSuperviaDate, 'without-data': !ship.outgoingSuperviaDate}">
+              <p>
+                {{ ship.outgoingSuperviaDate ? (ship.outgoingSuperviaDate | date: 'dd/MM/yy HH:mm') : '-'  }}
+              </p>
+              <label>
+                Supervia
+              </label>
+            </div>
+            <div class='col' [ngClass]="{'with-data': ship.outgoingPspDate, 'without-data': !ship.outgoingPspDate}">
+              <p>
+                {{ ship.outgoingPspDate ? (ship.outgoingPspDate | date: 'dd/MM/yy HH:mm') : '-' }}
+              </p>
+              <label>
+                PSP
+              </label>
+            </div>
+            <div class='col' [ngClass]="{'with-data': ship.startFumigationDate && ship.endFumigationDate, 
+                'without-data': !ship.startFumigationDate && !ship.endFumigationDate,
+                'current-data': ship.startFumigationDate && !ship.endFumigationDate
+              }">
+              <p *ngIf='!ship.startFumigationDate && !ship.endFumigationDate'>
+                -
+              </p>
+              <p *ngIf='ship.startFumigationDate && !ship.endFumigationDate'>
+                {{ ship.startFumigationDate | date: 'dd/MM/yy HH:mm' }}
+              </p>
+              <p *ngIf='ship.startFumigationDate && ship.endFumigationDate'>
+                {{ ship.endFumigationDate | date: 'dd/MM/yy HH:mm' }}
+              </p>
+              <label>
+                Fumigação
+              </label>
+            </div>
+            <div class='col'
+              [ngClass]="{'with-data': ship.outgoingTugboatDate, 'without-data': !ship.outgoingTugboatDate}">
+              <p>
+                {{ ship.outgoingTugboatDate ? (ship.outgoingTugboatDate | date: 'dd/MM/yy HH:mm') : '-' }}
+              </p>
+              <label>
+                Rebocador
+              </label>
+            </div>
+            <div class='col'
+              [ngClass]="{'with-data': ship.outgoingMaritimePilotDate, 'without-data': !ship.outgoingMaritimePilotDate}">
+              <p>
+                {{ ship.outgoingMaritimePilotDate ? (ship.outgoingMaritimePilotDate | date: 'dd/MM/yy HH:mm')  : '-' }}
+              </p>
+              <label>
+                Prático
+              </label>
+            </div>
+            <div class='col'
+              [ngClass]="{'with-data': ship.outgoingStartUnmooringDate, 'without-data': !ship.outgoingStartUnmooringDate}">
+              <p>
+                {{ ship.outgoingStartUnmooringDate ? (ship.outgoingStartUnmooringDate | date: 'dd/MM/yy HH:mm') :  '-'  }}
+              </p>
+              <label>
+                Amarrador
+              </label>
+            </div>
+
+          </div>
+        </nb-card-body>
+        <div *ngIf='terminal.ships.length == 0 && terminal.expanded' class='without-ships'>
+          <p>
+            Berço ocioso <br>
+            última desatracação às {{ terminal.lastOutgoingUnmooringDate | date: 'dd/MM/yy HH:mm' }}
+          </p>
+          <div class="waveWrapper waveAnimation">
+            <div class="waveWrapperInner bgTop">
+              <div class="wave waveTop"
+                style="background-image: url('http://front-end-noobs.com/jecko/img/wave-top.png')">
+              </div>
+            </div>
+            <div class="waveWrapperInner bgMiddle">
+              <div class="wave waveMiddle"
+                style="background-image: url('http://front-end-noobs.com/jecko/img/wave-mid.png')"></div>
+            </div>
+            <div class="waveWrapperInner bgBottom">
+              <div class="wave waveBottom"
+                style="background-image: url('http://front-end-noobs.com/jecko/img/wave-bot.png')"></div>
+            </div>
+          </div>
+        </div>
+
+      </nb-card>
+    </div>
+    <div *ngIf='menu[1].active'>
+      <h2 *ngIf='queue.length == 0' class='h2-without-results'>
+        Não há nenhum navio na fila
+      </h2>
+      <nb-card *ngFor='let terminal of queue' class='queue'>
+        <nb-card-header class='card-header'>
+          <div class='row'>
+            <div class='col-1'>
+              {{ terminal.terminalName }}
+            </div>
+            <div class='col-2 queue-info' [ngClass]="{'active': ship.active }" *ngFor='let ship of terminal.ships'
+              (click)='seeShipDetails(terminal, ship)'>
+              <strong>{{ ship.shipName }}</strong> <br>
+              {{ ship.productName }} <br>
+              ATA: {{ ship.atAnchorStartDate | date: 'dd/MM/yy HH:mm' }} <br>
+              ETA: {{ ship.estimatedMooringDate | date: 'dd/MM/yy HH:mm' }} <br>
+              {{ ship.draught }}m
+            </div>
+          </div>
+        </nb-card-header>
+        <nb-card-body *ngIf='terminal.shipDetails'>
+          <div class='row'>
+            <div class='col'>
+              <p>
+                {{ terminal.shipDetails.shipName }}
+              </p>
+              <label>
+                Nome do navio
+              </label>
+            </div>
+            <div class='col'>
+              <p>
+                {{ terminal.shipDetails.draught ? terminal.shipDetails.draught + 'm' : '-' }}
+              </p>
+              <label>
+                Calado
+              </label>
+            </div>
+            <div class='col'>
+              <p>
+                {{ terminal.shipDetails.atAnchorStartDate ? (terminal.shipDetails.atAnchorStartDate | date: 'dd/MM/yy HH:mm') : '-' }}
+              </p>
+              <label>
+                Horário fundeado
+              </label>
+            </div>
+            <div class='col'>
+              <p>
+                {{ terminal.shipDetails.estimatedMooringDate ? (terminal.shipDetails.estimatedMooringDate | date: 'dd/MM/yy HH:mm') : '-' }}
+              </p>
+              <label>
+                Previsão de atracação
+              </label>
+            </div>
+            <div class='col'>
+              <p>
+                {{ terminal.shipDetails.amountOfHoursAnchored }}
+              </p>
+              <label>
+                Aguardando
+              </label>
+            </div>
+          </div>
+          <div class='row status'>
+            <div class='col'
+              [ngClass]="{'with-data': terminal.shipDetails.incomingSuperviaDate, 'without-data': !terminal.shipDetails.incomingSuperviaDate  }">
+              <p>
+                {{ terminal.shipDetails.incomingSuperviaDate ? (terminal.shipDetails.incomingSuperviaDate  | date: 'dd/MM/yy HH:mm') : '-' }}
+              </p><label>Supervia</label>
+            </div>
+            <div class='col'
+              [ngClass]="{'with-data': terminal.shipDetails.incomingPspDate, 'without-data': !terminal.shipDetails.incomingPspDate }">
+              <p>
+                {{ terminal.shipDetails.incomingPspDate ? (terminal.shipDetails.incomingPspDate | date: 'dd/MM/yy HH:mm') : '-' }}
+              </p><label>PSP</label>
+            </div>
+            <div class='col'
+              [ngClass]="{'with-data': terminal.shipDetails.incomingTugboatDate, 'without-data': !terminal.shipDetails.incomingTugboatDate  }">
+              <p>
+                {{ terminal.shipDetails.incomingTugboatDate ? (terminal.shipDetails.incomingTugboatDate   | date: 'dd/MM/yy HH:mm') : '-' }}
+              </p><label>Rebocador</label>
+            </div>
+            <div class='col'
+              [ngClass]="{'with-data': terminal.shipDetails.incomingTugboatDate, 'without-data': !terminal.shipDetails.incomingTugboatDate  }">
+              <p>
+                {{ terminal.shipDetails.incomingTugboatDate ? (terminal.shipDetails.incomingMaritimePilotDate   | date: 'dd/MM/yy HH:mm') : '-' }}
+              </p><label>Prático</label>
+            </div>
+            <div class='col'
+              [ngClass]="{'with-data': terminal.shipDetails.incomingStartMooringDate, 'without-data': !terminal.shipDetails.incomingStartMooringDate  }">
+              <p>
+                {{ terminal.shipDetails.incomingStartMooringDate ? (terminal.shipDetails.incomingStartMooringDate   | date: 'dd/MM/yy HH:mm') : '-' }}
+              </p><label>Amarrador</label>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <div *ngIf='menu[2].active' class='ranking-list'>
+        <h2 *ngIf='ranking.length == 0' class='h2-without-results'>
+            Não há dados para mostrar
+          </h2>
+        <div class='row' *ngIf='ranking && ranking.length > 0' >
+            <div class='col-3'>
+                <label> Posição</label>
+            </div>
+            <div class='col-3'>
+                <label> Nome do Terminal</label>
+            </div>
+            <div class='col-3'>
+                <label> Aderência da Prancha</label>
+            </div>
+            <div class='col-3'>
+                <label> Total embarcado </label>
+            </div>
+          </div>
+      <nb-card *ngFor='let item of ranking; let i = index' class='ranking'>
+        <nb-card-header class='card-header'>
+          <div class='row'>
+            <div class='col-3'>
+              <p> {{ i+1 }}</p> 
+            </div>
+            <div class='col-3'>
+              <p> {{ item.terminal_name }}</p> 
+            </div>
+            <div class='col-3'>
+              <p> {{ item.adherence | number: '1.0-2' }}%</p> 
+            </div>
+            <div class='col-3'>
+              <p> {{ item.total_boarded | number: '1.0-2' }}</p> 
+            </div>
+          </div>
+        </nb-card-header>
+      </nb-card>
+    </div>
+  </div>
+  <div class='col-2' id='list-of-tides'>
+    <nb-card>
+      <nb-card-header>
+        Tábua das marés
+      </nb-card-header>
+      <nb-card-body>
+        <div *ngFor='let tide of tides' class='day'>
+          <p>
+            {{ checkDateNumber(tide.date) === todayDay ? 'Hoje' : (tide.date | date: 'dd/MM')}}
+          </p>
+          <div class='row'>
+            <div class='col'>Hora </div>
+            <div class='col'>Previsto </div>
+            <div class='col'>Atual </div>
+          </div>
+          <div class='row period' [ngClass]='{"current": periodTime.currentHour }'
+            *ngFor='let periodTime of tide.period'>
+            <div class='col'>{{ periodTime.hour }}h </div>
+            <div class='col'>{{ periodTime.planned }}m </div>
+            <div class='col'>{{ tide.currentDay && (tide.currentHour >= periodTime.hour) ? (periodTime.current + 'm') : '-' }}  </div>
+          </div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>
+
+<footer>
+  <div class='row'>
+    <div class='col-3'>
+      <p> Navios atracados </p>
+      <span> {{ quantityOfMooredShips }} </span>
+    </div>
+    <div class='col-3'>
+      <p> Navios em fila </p>
+      <span> {{ quantityOfQueueShips }} </span>
+    </div>
+    <div class='col-3'>
+      <p> Total embarcado em operação </p>
+      <span> {{ totalOnBoard | number: '1.0-2' }}t </span>
+    </div>
+    <div class='col-3'>
+        <p> Total embarcado acumulado </p>
+        <span> {{ totalBoarded | number: '1.0-2' }}t </span>
+      </div>
+  </div>
+</footer>
