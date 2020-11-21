@@ -59,11 +59,11 @@ export class HomeComponent implements OnInit {
 
   async getRanking() {
     this.loading = true;
-    let ranking: any = await this.dashboardService.getRanking();
-    if (ranking && ranking.length > 0) {
+    this.dashboardService.getRanking().then((ranking:any) => {
       this.ranking = _.orderBy(ranking, ["adherence"], ["desc"]);
-    }
-    this.loading = false;
+    }, (err) => {
+      this.loading = false;
+    });    
   }
 
   private async getTides() {
