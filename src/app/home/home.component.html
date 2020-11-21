@@ -260,7 +260,7 @@
             <div class='col'>
                 <div *ngIf='!ship.endShipmentDate'>
                     <p>
-                      {{ ship.estimatedEndShipmentDate }}
+                      {{ ship.estimatedEndShipmentDate | date: 'dd/MM/yy HH:mm' }}
                     </p>
                     <label> 
                         Previsão do término

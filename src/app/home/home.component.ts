@@ -61,6 +61,7 @@ export class HomeComponent implements OnInit {
     this.loading = true;
     this.dashboardService.getRanking().then((ranking:any) => {
       this.ranking = _.orderBy(ranking, ["adherence"], ["desc"]);
+      this.loading = false;
     }, (err) => {
       this.loading = false;
     });    
