@@ -551,21 +551,21 @@
       <p> Navios atracados </p>
       <span> {{ quantityOfMooredShips }} </span>
     </div>
-    <div class='col-1'>
+    <div class='col-2'>
       <p> Navios em fila </p>
       <span> {{ quantityOfQueueShips }} </span>
     </div>
-    <div class='col-2'>
+    <div class='col-3'>
       <p> Total embarcado em operação </p>
       <span> {{ totalOnBoard | number: '1.0-2' }}t </span>
     </div>
-    <div class='col-2'>
+    <div class='col-3'>
       <p> Total embarcado acumulado </p>
       <span> {{ totalBoarded | number: '1.0-2' }}t </span>
     </div>
-    <div class='col-5'>
+    <div class='col-2'>
       <p> Importar planilha </p>
-      <input type='file' (change)="onUploadFile($event)">
+      <input type='file' (change)="onUploadFile($event)" class='custom-file-input'>
     </div>
   </div>
 </footer>
