@@ -34,4 +34,17 @@ export class DashboardService {
       .toPromise();
   }
 
+  async getClimaTempoData() {
+    return await this.http
+      .get(`${environment.apiUrl}/tides/weather`)
+      .toPromise();
+  }
+
+  async importFile(file: any) {
+    var fd = new FormData();
+    fd.append("file", file);
+    return this.http.post(`${environment.apiUrl}/import/sheet`, fd).toPromise();
+  }
+
+  // add readme do projeto
 }

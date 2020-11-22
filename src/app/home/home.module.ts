@@ -11,6 +11,7 @@ import { HomeRoutingModule } from "./home-routing.module";
 import { HomeComponent } from "./home.component";
 import { DashboardService } from "../dashboard.service";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 @NgModule({
   declarations: [HomeComponent],
@@ -21,7 +22,9 @@ import { HttpClient, HttpClientModule } from "@angular/common/http";
     NbDialogModule.forRoot(),
     HomeRoutingModule,
     HttpClientModule,
-    NbSpinnerModule
+    NbSpinnerModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [
     // { provide: LOCALE_ID, useValue: "pt-BR" },

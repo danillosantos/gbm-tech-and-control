@@ -7,17 +7,25 @@
         </li>
       </ul>
     </div>
-    <div class='col-2' id='local'>
-      <p>
-        Porto de Santos
-      </p>
+    <div class='col-2' id='clima-tempo'>
+      <div class='clima-tempo-container'>
+          <p>
+              Porto de Santos
+            </p>
+            <div class='row' *ngIf='climaTempoData'>
+              <div class='col-1'><img src='https://www.flaticon.com/svg/static/icons/svg/616/616546.svg'></div>
+              <div class='col-3'>{{ climaTempoData.rain.precipitation }}mm</div>
+              <div class='col-1'><img src='https://www.flaticon.com/svg/static/icons/svg/1684/1684375.svg'></div>
+              <div class='col-3'>{{ climaTempoData.temperature.temperature }}º C</div>
+            </div>
+      </div>
     </div>
   </div>
   <div class='col-10' id='list-of-ships' [nbSpinner]='loading'>
     <div *ngIf='menu[0].active'>
-        <h2 *ngIf='!loading && terminals.length == 0' class='h2-without-results'>
-            Não há dados para mostrar
-          </h2>
+      <h2 *ngIf='!loading && terminals.length == 0' class='h2-without-results'>
+        Não há dados para mostrar
+      </h2>
       <nb-card *ngFor='let terminal of terminals' (click)='expandTerminalCard(terminal)'>
         <nb-card-header *ngIf='!terminal.expanded && terminal.ships.length > 0' class='card-header'>
           <div class='row'>
@@ -83,17 +91,17 @@
                     {{ ship.estimatedEndShipmentDate | date: 'dd/MM/yy HH:mm' }}
                   </p>
                   <label>
-                      Previsão do término
+                    Previsão do término
                   </label>
                 </div>
                 <div *ngIf='ship.endShipmentDate'>
-                    <p>
-                      {{ ship.endShipmentDate | date: 'dd/MM/yy HH:mm' }}
-                    </p>
-                    <label>
-                        Término do embarque
-                    </label>
-                  </div>
+                  <p>
+                    {{ ship.endShipmentDate | date: 'dd/MM/yy HH:mm' }}
+                  </p>
+                  <label>
+                    Término do embarque
+                  </label>
+                </div>
                 <div class='col'>
                   <div>
                     <p>
@@ -124,7 +132,7 @@
             <div class='col-4 without-padding'>
               {{ terminal.terminalName}} <br>
               <small>
-                Berço ocioso 
+                Berço ocioso
                 <span *ngIf='terminal.lastOutgoingUnmooringDate'>
                   - última desatracação às {{ terminal.lastOutgoingUnmooringDate | date: 'dd/MM/yy HH:mm' }}
                 </span>
@@ -258,22 +266,22 @@
               </div>
             </div>
             <div class='col'>
-                <div *ngIf='!ship.endShipmentDate'>
-                    <p>
-                      {{ ship.estimatedEndShipmentDate | date: 'dd/MM/yy HH:mm' }}
-                    </p>
-                    <label> 
-                        Previsão do término
-                    </label>
-                  </div>
-                  <div *ngIf='ship.endShipmentDate'>
-                      <p>
-                        {{ ship.endShipmentDate | date: 'dd/MM/yy HH:mm' }}
-                      </p>
-                      <label>
-                          Término do embarque
-                      </label>
-                    </div>
+              <div *ngIf='!ship.endShipmentDate'>
+                <p>
+                  {{ ship.estimatedEndShipmentDate | date: 'dd/MM/yy HH:mm' }}
+                </p>
+                <label>
+                  Previsão do término
+                </label>
+              </div>
+              <div *ngIf='ship.endShipmentDate'>
+                <p>
+                  {{ ship.endShipmentDate | date: 'dd/MM/yy HH:mm' }}
+                </p>
+                <label>
+                  Término do embarque
+                </label>
+              </div>
               <div>
                 <p>
                   {{ ship.estimatedUnmooringDate | date: 'dd/MM/yy HH:mm' }}
@@ -472,37 +480,37 @@
       </nb-card>
     </div>
     <div *ngIf='menu[2].active' class='ranking-list'>
-        <h2 *ngIf='ranking.length == 0' class='h2-without-results'>
-            Não há dados para mostrar
-          </h2>
-        <div class='row' *ngIf='ranking && ranking.length > 0' >
-            <div class='col-3'>
-                <label> Posição</label>
-            </div>
-            <div class='col-3'>
-                <label> Nome do Terminal</label>
-            </div>
-            <div class='col-3'>
-                <label> Aderência da Prancha</label>
-            </div>
-            <div class='col-3'>
-                <label> Total embarcado </label>
-            </div>
-          </div>
+      <h2 *ngIf='ranking.length == 0' class='h2-without-results'>
+        Não há dados para mostrar
+      </h2>
+      <div class='row' *ngIf='ranking && ranking.length > 0'>
+        <div class='col-3'>
+          <label> Posição</label>
+        </div>
+        <div class='col-3'>
+          <label> Nome do Terminal</label>
+        </div>
+        <div class='col-3'>
+          <label> Aderência da Prancha</label>
+        </div>
+        <div class='col-3'>
+          <label> Total embarcado </label>
+        </div>
+      </div>
       <nb-card *ngFor='let item of ranking; let i = index' class='ranking'>
         <nb-card-header class='card-header'>
           <div class='row'>
             <div class='col-3'>
-              <p> {{ i+1 }}</p> 
+              <p> {{ i+1 }}</p>
             </div>
             <div class='col-3'>
-              <p> {{ item.terminal_name }}</p> 
+              <p> {{ item.terminal_name }}</p>
             </div>
             <div class='col-3'>
-              <p> {{ item.adherence | number: '1.0-2' }}%</p> 
+              <p> {{ item.adherence | number: '1.0-2' }}%</p>
             </div>
             <div class='col-3'>
-              <p> {{ item.total_boarded | number: '1.0-2' }}</p> 
+              <p> {{ item.total_boarded | number: '1.0-2' }}</p>
             </div>
           </div>
         </nb-card-header>
@@ -528,7 +536,8 @@
             *ngFor='let periodTime of tide.period'>
             <div class='col'>{{ periodTime.hour }}h </div>
             <div class='col'>{{ periodTime.planned }}m </div>
-            <div class='col'>{{ tide.currentDay && (tide.currentHour >= periodTime.hour) ? (periodTime.current + 'm') : '-' }}  </div>
+            <div class='col'>
+              {{ tide.currentDay && (tide.currentHour >= periodTime.hour) ? (periodTime.current + 'm') : '-' }} </div>
           </div>
         </div>
       </nb-card-body>
@@ -538,21 +547,25 @@
 
 <footer>
   <div class='row'>
-    <div class='col-3'>
+    <div class='col-2'>
       <p> Navios atracados </p>
       <span> {{ quantityOfMooredShips }} </span>
     </div>
-    <div class='col-3'>
+    <div class='col-1'>
       <p> Navios em fila </p>
       <span> {{ quantityOfQueueShips }} </span>
     </div>
-    <div class='col-3'>
+    <div class='col-2'>
       <p> Total embarcado em operação </p>
       <span> {{ totalOnBoard | number: '1.0-2' }}t </span>
     </div>
-    <div class='col-3'>
-        <p> Total embarcado acumulado </p>
-        <span> {{ totalBoarded | number: '1.0-2' }}t </span>
-      </div>
+    <div class='col-2'>
+      <p> Total embarcado acumulado </p>
+      <span> {{ totalBoarded | number: '1.0-2' }}t </span>
+    </div>
+    <div class='col-5'>
+      <p> Importar planilha </p>
+      <input type='file' (change)="onUploadFile($event)">
+    </div>
   </div>
 </footer>

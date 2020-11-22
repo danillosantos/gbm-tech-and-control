@@ -37,6 +37,8 @@ export class HomeComponent implements OnInit {
   quantityOfQueueShips: any = 0;
   totalOnBoard: any = 0;
   totalBoarded: any = 0;
+  file: any = null;
+  climaTempoData: any = null;
 
   constructor(private dashboardService: DashboardService) {}
 
@@ -45,6 +47,7 @@ export class HomeComponent implements OnInit {
     await this.getTides();
     await this.getQueue();
     await this.getRanking();
+    await this.getClimaTempoData();
     this.getDashboardInformation();
   }
 
@@ -54,17 +57,33 @@ export class HomeComponent implements OnInit {
       await this.getTides();
       await this.getQueue();
       await this.getRanking();
+      await this.getClimaTempoData();
     }, 1000 * 75);
+  }
+
+  async getClimaTempoData() {
+    let res: any = await this.dashboardService.getClimaTempoData();
+    console.log("res", res);
+    this.climaTempoData = res.data.find(period => {
+      return (
+        moment(period.date).date() == moment().date() &&
+        moment(period.date).hour() == moment().hour()
+      );
+    });
+    console.log(this.climaTempoData);
   }
 
   async getRanking() {
     this.loading = true;
-    this.dashboardService.getRanking().then((ranking:any) => {
-      this.ranking = _.orderBy(ranking, ["adherence"], ["desc"]);
-      this.loading = false;
-    }, (err) => {
-      this.loading = false;
-    });    
+    this.dashboardService.getRanking().then(
+      (ranking: any) => {
+        this.ranking = _.orderBy(ranking, ["adherence"], ["desc"]);
+        this.loading = false;
+      },
+      err => {
+        this.loading = false;
+      }
+    );
   }
 
   private async getTides() {
@@ -265,5 +284,26 @@ export class HomeComponent implements OnInit {
     ships.forEach((ship: any) => {
       ship.percentageOnBoard = (ship.totalOnBoard / ship.totalManifested) * 100;
     });
+  }
+
+  importFile() {
+    if (!this.file) {
+      return;
+    }
+    this.dashboardService.importFile(this.file).then(
+      () => {
+        this.file = null;
+        this.getDashboardInformation();
+      },
+      err => {}
+    );
+  }
+
+  async onUploadFile(event) {
+    let file = event.target.files[0];
+    await this.dashboardService.importFile(file);
+    this.loading = true;
+    this.getDashboardInformation();
+    window.location.reload();
   }
 }
